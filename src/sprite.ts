@@ -124,6 +124,12 @@ export function initSprites(img: HTMLImageElement) {
 
   const s_score = new Sprite(img, 138, 56, 113, 58);
   const s_splash = new Sprite(img, 0, 114, 59, 49);
+  const s_medals = {
+    Platinum: new Sprite(img, 175, 114, 22, 22),
+    Silver: new Sprite(img, 197, 114, 22, 22),
+    Gold: new Sprite(img, 175, 136, 22, 22),
+    Bronze: new Sprite(img, 197, 136, 22, 22),
+  };
 
   const s_numberS = new Sprite(img, 0, 177, 6, 7);
   const s_numberB = new Sprite(img, 0, 188, 7, 10);
@@ -137,6 +143,7 @@ export function initSprites(img: HTMLImageElement) {
     s_text,
     s_score,
     s_splash,
+    s_medals,
     s_buttons,
     s_numberS,
     s_numberB,

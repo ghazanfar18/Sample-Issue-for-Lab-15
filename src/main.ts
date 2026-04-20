@@ -10,6 +10,7 @@ var s_text: TSpriteCollection;
 var s_score: TSprite;
 var s_splash: TSprite;
 var s_buttons: TSpriteCollection;
+var s_medals: TSpriteCollection;
 var s_numberS: TSprite;
 var s_numberB: TSprite;
 
@@ -178,6 +179,14 @@ class Pipes {
 
 const pipes = new Pipes();
 
+function getMedal(scoreValue: number): TSprite | null {
+  if (scoreValue >= 40) return s_medals.Platinum;
+  if (scoreValue >= 30) return s_medals.Gold;
+  if (scoreValue >= 20) return s_medals.Silver;
+  if (scoreValue >= 10) return s_medals.Bronze;
+  return null;
+}
+
 function onKeyDown(evt: KeyboardEvent) {
   if (evt.code === "Space") {
     switch (currentstate) {
@@ -264,6 +273,7 @@ function main() {
     s_text = result.s_text;
     s_score = result.s_score;
     s_splash = result.s_splash;
+    s_medals = result.s_medals;
     s_buttons = result.s_buttons;
     s_numberS = result.s_numberS;
     s_numberB = result.s_numberB;
@@ -350,8 +360,15 @@ function render() {
       centerX - s_text.GameOver.width / 2,
       height - 400
     );
-    s_score.draw(ctx, centerX - s_score.width / 2, height - 340);
+    const scoreBoxX = centerX - s_score.width / 2;
+    const scoreBoxY = height - 340;
+    s_score.draw(ctx, scoreBoxX, scoreBoxY);
     s_buttons.Ok.draw(ctx, okbtn.x, okbtn.y);
+
+    const medal = getMedal(score);
+    if (medal) {
+      medal.draw(ctx, scoreBoxX + 28, scoreBoxY + 44);
+    }
 
     s_numberS.draw(ctx, centerX - 47, height - 304, score, 0, 10);
     s_numberS.draw(ctx, centerX - 47, height - 262, best, 0, 10);
