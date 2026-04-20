@@ -3,7 +3,6 @@ import {
   CANVAS_DESKTOP_MIN_WIDTH,
   CANVAS_DESKTOP_WIDTH,
   CANVAS_FILL_COLOR,
-  CANVAS_MAX_HEIGHT,
 } from "../constants/screen.constants";
 
 export type CanvasSetup = {
@@ -16,15 +15,32 @@ export type CanvasSetup = {
 
 export function setupCanvas(): CanvasSetup {
   const canvas = document.createElement("canvas");
-  let width = window.innerWidth;
-  let height = Math.min(window.innerHeight, CANVAS_MAX_HEIGHT);
+  const viewportWidth = Math.round(window.visualViewport?.width ?? window.innerWidth);
+  const viewportHeight = Math.round(
+    window.visualViewport?.height ?? window.innerHeight
+  );
+  const hasTouchSupport =
+    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const desktopLikePointer = window.matchMedia("(pointer: fine)").matches;
+  const isDesktopLayout =
+    desktopLikePointer && !hasTouchSupport && viewportWidth >= CANVAS_DESKTOP_MIN_WIDTH;
+
+  let width = viewportWidth;
+  let height = viewportHeight;
   let inputEvent: "mousedown" | "touchstart" = "touchstart";
 
-  if (width >= CANVAS_DESKTOP_MIN_WIDTH) {
+  if (isDesktopLayout) {
     width = CANVAS_DESKTOP_WIDTH;
     height = CANVAS_DESKTOP_HEIGHT;
     canvas.style.border = "1px solid #000";
     inputEvent = "mousedown";
+  } else {
+    // Keep original 400x600 game world and scale it to fit.
+    width = CANVAS_DESKTOP_WIDTH;
+    height = CANVAS_DESKTOP_HEIGHT;
+    const scale = Math.min(viewportWidth / width, viewportHeight / height);
+    canvas.style.width = `${Math.round(width * scale)}px`;
+    canvas.style.height = `${Math.round(height * scale)}px`;
   }
 
   canvas.width = width;

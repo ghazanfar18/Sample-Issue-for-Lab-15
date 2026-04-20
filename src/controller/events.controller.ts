@@ -3,7 +3,10 @@ import type { InputCoords } from "../types/ui.types";
 import type { GameController } from "./game.controller";
 
 export class EventsController {
-  constructor(private readonly game: GameController) {}
+  constructor(
+    private readonly game: GameController,
+    private readonly canvas: HTMLCanvasElement
+  ) {}
 
   attach(inputEvent: "mousedown" | "touchstart"): void {
     document.addEventListener("keydown", this.onKeyDown);
@@ -48,9 +51,13 @@ export class EventsController {
   };
 
   private extractCoords(evt: MouseEvent | TouchEvent): InputCoords {
-    if (evt instanceof MouseEvent) {
-      return { x: evt.offsetX, y: evt.offsetY };
-    }
-    return { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
+    const rect = this.canvas.getBoundingClientRect();
+    const clientX = evt instanceof MouseEvent ? evt.clientX : evt.touches[0].clientX;
+    const clientY = evt instanceof MouseEvent ? evt.clientY : evt.touches[0].clientY;
+
+    return {
+      x: ((clientX - rect.left) * this.canvas.width) / rect.width,
+      y: ((clientY - rect.top) * this.canvas.height) / rect.height,
+    };
   }
 }
