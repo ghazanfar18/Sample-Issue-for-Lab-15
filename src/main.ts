@@ -279,10 +279,26 @@ function main() {
   img.src = "/sheet.png";
 }
 
-// Game loop
+// Game loop — fixed timestep so game speed is independent of monitor refresh rate
 function run() {
-  const loop = () => {
-    update();
+  const TICK_RATE = 1000 / 60;
+  let lastTime = performance.now();
+  let accumulator = 0;
+
+  const loop = (now: number) => {
+    accumulator += now - lastTime;
+    lastTime = now;
+
+    // Cap to avoid spiral of death after tab-away or lag spikes
+    if (accumulator > TICK_RATE * 5) {
+      accumulator = TICK_RATE * 5;
+    }
+
+    while (accumulator >= TICK_RATE) {
+      update();
+      accumulator -= TICK_RATE;
+    }
+
     render();
     window.requestAnimationFrame(loop);
   };
