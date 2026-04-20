@@ -11,6 +11,7 @@ import {
   SCORE_GAME_OVER_Y_OFFSET,
   SCORE_MEDAL_PANEL_X_OFFSET,
   SCORE_MEDAL_PANEL_Y_OFFSET,
+  SCORE_MEDAL_SCALE,
   SCORE_NUMBER_X_OFFSET,
   SCORE_PANEL_Y_OFFSET,
   SPLASH_BANNER_Y_OFFSET,
@@ -91,10 +92,22 @@ export class MainView {
 
     const medal = getMedalForScore(score, sprites);
     if (medal) {
-      medal.draw(
-        ctx,
-        panelX + SCORE_MEDAL_PANEL_X_OFFSET,
-        panelY + SCORE_MEDAL_PANEL_Y_OFFSET
+      const scaledWidth = medal.width * SCORE_MEDAL_SCALE;
+      const scaledHeight = medal.height * SCORE_MEDAL_SCALE;
+      const medalX =
+        panelX + SCORE_MEDAL_PANEL_X_OFFSET - (scaledWidth - medal.width) / 2;
+      const medalY =
+        panelY + SCORE_MEDAL_PANEL_Y_OFFSET - (scaledHeight - medal.height) / 2;
+      ctx.drawImage(
+        medal.img,
+        medal.x,
+        medal.y,
+        medal.width,
+        medal.height,
+        medalX,
+        medalY,
+        scaledWidth,
+        scaledHeight
       );
     }
 
@@ -115,4 +128,5 @@ export class MainView {
       10
     );
   }
+
 }

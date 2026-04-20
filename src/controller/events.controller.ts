@@ -17,6 +17,7 @@ export class EventsController {
 
   private onKeyDown = (evt: KeyboardEvent): void => {
     if (evt.code !== "Space") return;
+    if (!this.game.canAcceptInput()) return;
 
     switch (this.game.getState()) {
       case GameState.Splash:
@@ -29,6 +30,9 @@ export class EventsController {
   };
 
   private onPress = (evt: MouseEvent | TouchEvent): void => {
+    if (!this.game.canAcceptInput()) return;
+    const { x, y } = this.extractCoords(evt);
+
     switch (this.game.getState()) {
       case GameState.Splash:
         this.game.startGame();
@@ -37,7 +41,6 @@ export class EventsController {
         this.game.jump();
         break;
       case GameState.Score: {
-        const { x, y } = this.extractCoords(evt);
         this.game.tryRestartAt(x, y);
         break;
       }

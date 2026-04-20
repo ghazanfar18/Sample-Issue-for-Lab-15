@@ -6,8 +6,11 @@ import { Button } from "../model/button.model";
 import { MainView } from "../views/main.view";
 import {
   BEST_SCORE_KEY,
+  INPUT_LOCK_AFTER_DEATH_MS,
   FG_SCROLL_SPEED,
   FG_WRAP_WIDTH,
+  SCREEN_SHAKE_AMPLITUDE,
+  SCREEN_SHAKE_DURATION_MS,
   SCORE_OK_BUTTON_Y_OFFSET,
 } from "../constants";
 
@@ -17,6 +20,8 @@ export class GameController {
   private best: number;
   private frameCount = 0;
   private fgpos = 0;
+  private inputLockedUntil = 0;
+  private shakeUntil = 0;
 
   private readonly bird: Bird;
   private readonly pipes: Pipes;
@@ -54,6 +59,10 @@ export class GameController {
     this.bird.jump();
   }
 
+  canAcceptInput(): boolean {
+    return performance.now() >= this.inputLockedUntil;
+  }
+
   tryRestartAt(x: number, y: number): void {
     if (this.okButton.contains(x, y)) {
       this.reset();
@@ -81,7 +90,7 @@ export class GameController {
       );
       this.score += scoreDelta;
       if (hit) {
-        this.state = GameState.Score;
+        this.handleDeath();
       }
     }
 
@@ -93,11 +102,21 @@ export class GameController {
     );
 
     if (hitGround && this.state === GameState.Game) {
-      this.state = GameState.Score;
+      this.handleDeath();
     }
   }
 
   render(): void {
+    const now = performance.now();
+    const isShaking = now < this.shakeUntil;
+
+    if (isShaking) {
+      const shakeX = (Math.random() * 2 - 1) * SCREEN_SHAKE_AMPLITUDE;
+      const shakeY = (Math.random() * 2 - 1) * SCREEN_SHAKE_AMPLITUDE;
+      this.ctx.save();
+      this.ctx.translate(shakeX, shakeY);
+    }
+
     this.view.render(
       this.ctx,
       {
@@ -113,6 +132,18 @@ export class GameController {
       this.pipes,
       this.sprites
     );
+
+    if (isShaking) {
+      this.ctx.restore();
+    }
+  }
+
+  private handleDeath(): void {
+    if (this.state !== GameState.Game) return;
+    this.state = GameState.Score;
+    const now = performance.now();
+    this.inputLockedUntil = now + INPUT_LOCK_AFTER_DEATH_MS;
+    this.shakeUntil = now + SCREEN_SHAKE_DURATION_MS;
   }
 
   private reset(): void {
