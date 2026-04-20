@@ -26,13 +26,14 @@ export class MainView {
     pipes: Pipes,
     sprites: GameSprites
   ): void {
-    const { state, width, height, score, best, fgpos, okButton } = snapshot;
+    const { state, width, height, bgpos, score, best, fgpos, okButton } = snapshot;
     const centerX = width / 2;
 
     ctx.fillRect(0, 0, width, height);
 
-    sprites.s_bg.draw(ctx, 0, height - sprites.s_bg.height);
-    sprites.s_bg.draw(ctx, sprites.s_bg.width, height - sprites.s_bg.height);
+    sprites.s_bg.draw(ctx, bgpos, height - sprites.s_bg.height);
+    sprites.s_bg.draw(ctx, bgpos + sprites.s_bg.width, height - sprites.s_bg.height);
+    sprites.s_bg.draw(ctx, bgpos - sprites.s_bg.width, height - sprites.s_bg.height);
 
     pipes.draw(ctx, sprites.s_pipeNorth, sprites.s_pipeSouth);
     bird.draw(ctx, sprites.s_bird);

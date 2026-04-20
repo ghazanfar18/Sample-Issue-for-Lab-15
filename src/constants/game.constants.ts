@@ -1,5 +1,6 @@
 export const TICK_RATE = 1000 / 60;
 export const TICK_SPIRAL_CAP = 5;
+export const MAX_UPDATES_PER_FRAME = 2;
 export const BEST_SCORE_KEY = "best";
 export const SPRITE_SHEET_SRC = "/sheet.png";
 export const INPUT_LOCK_AFTER_DEATH_MS = 1500;

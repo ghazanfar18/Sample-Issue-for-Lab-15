@@ -10,6 +10,7 @@ export type GameSnapshot = {
   state: GameState;
   width: number;
   height: number;
+  bgpos: number;
   score: number;
   best: number;
   fgpos: number;

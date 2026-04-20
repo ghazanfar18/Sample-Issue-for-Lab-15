@@ -5,6 +5,10 @@ import { Pipes } from "../model/pipe.model";
 import { Button } from "../model/button.model";
 import { MainView } from "../views/main.view";
 import {
+  BG_MOTION_ACTIVE_FRAMES,
+  BG_MOTION_CYCLE_FRAMES,
+  BG_MOTION_SCORE_THRESHOLD,
+  BG_SCROLL_SPEED,
   BEST_SCORE_KEY,
   INPUT_LOCK_AFTER_DEATH_MS,
   FG_SCROLL_SPEED,
@@ -19,6 +23,7 @@ export class GameController {
   private score = 0;
   private best: number;
   private frameCount = 0;
+  private bgpos = 0;
   private fgpos = 0;
   private inputLockedUntil = 0;
   private shakeUntil = 0;
@@ -73,6 +78,9 @@ export class GameController {
     this.frameCount++;
 
     if (this.state !== GameState.Score) {
+      if (this.state === GameState.Game && this.shouldAnimateBackground()) {
+        this.bgpos = (this.bgpos - BG_SCROLL_SPEED) % this.sprites.s_bg.width;
+      }
       this.fgpos = (this.fgpos - FG_SCROLL_SPEED) % FG_WRAP_WIDTH;
     } else {
       this.best = Math.max(this.best, this.score);
@@ -123,6 +131,7 @@ export class GameController {
         state: this.state,
         width: this.canvasWidth,
         height: this.canvasHeight,
+        bgpos: this.bgpos,
         score: this.score,
         best: this.best,
         fgpos: this.fgpos,
@@ -151,5 +160,13 @@ export class GameController {
     this.state = GameState.Splash;
     this.score = 0;
     this.frameCount = 0;
+    this.bgpos = 0;
+  }
+
+  private shouldAnimateBackground(): boolean {
+    if (this.score < BG_MOTION_SCORE_THRESHOLD) return false;
+    return (
+      this.frameCount % BG_MOTION_CYCLE_FRAMES < BG_MOTION_ACTIVE_FRAMES
+    );
   }
 }
